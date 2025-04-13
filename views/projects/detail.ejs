@@ -1,0 +1,607 @@
+<div class="project-detail">
+  <div class="page-header">
+    <div class="header-left">
+      <a href="/projects" class="back-link">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+        </svg>
+        Back to Projects
+      </a>
+      <h1 class="page-title"><%= project.name %></h1>
+    </div>
+    <div class="header-right">
+      <div class="header-actions">
+        <a href="/projects/<%= project._id %>/edit" class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+          </svg>
+          Edit
+        </a>
+        <button class="btn btn-danger" id="delete-project-btn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+          </svg>
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-overview">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Project Overview</h3>
+        <span class="status-badge <%= project.status ? project.status.toLowerCase() : 'unknown' %>">
+          <%= project.status || 'Unknown' %>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="overview-grid">
+          <div class="overview-item">
+            <h4 class="overview-label">Description</h4>
+            <p class="overview-value"><%= project.description || 'No description provided' %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Team</h4>
+            <p class="overview-value"><%= project.team || 'No team assigned' %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Due Date</h4>
+            <p class="overview-value"><%= project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set' %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Progress</h4>
+            <div class="progress-bar">
+              <div class="progress" style="width: <%= project.progress || 0 %>%"></div>
+            </div>
+            <span class="progress-text"><%= project.progress || 0 %>%</span>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Timeline (<%= project.daysRemaining || 0 %> days remaining)</h4>
+            <div class="progress-bar timeline-bar">
+              <div class="progress <%= (project.timeProgress || 0) > 75 ? 'bg-warning' : '' %>" style="width: <%= project.timeProgress || 0 %>%"></div>
+            </div>
+            <span class="progress-text"><%= project.timeProgress || 0 %>% of time elapsed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-tasks">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Tasks</h3>
+        <button class="btn btn-sm" id="add-task-btn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+          </svg>
+          Add Task
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="tasks-list">
+          <% if (tasks && tasks.length > 0) { %>
+            <% tasks.forEach(task => { %>
+              <div class="task-item" data-id="<%= task._id %>">
+                <div class="task-checkbox">
+                  <input type="checkbox" id="task-<%= task._id %>" <%= task.status === 'Completed' ? 'checked' : '' %> class="task-status-checkbox" data-id="<%= task._id %>" data-status="<%= task.status %>">
+                  <label for="task-<%= task._id %>"></label>
+                </div>
+                <div class="task-content">
+                  <h4 class="task-title"><%= task.title %></h4>
+                  <p class="task-meta">
+                    <% if (task.dueDate) { %>
+                      Due: <%= new Date(task.dueDate).toLocaleDateString() %> •
+                    <% } %>
+                    <% if (task.assignedTo) { %>
+                      Assigned to: <%= task.assignedTo.displayName %>
+                    <% } else { %>
+                      Unassigned
+                    <% } %>
+                    <% if (task.priority) { %>
+                      • Priority: <%= task.priority %>
+                    <% } %>
+                  </p>
+                </div>
+                <div class="task-actions">
+                  <a href="/tasks/edit/<%= task._id %>?redirect=/projects/<%= project._id %>" class="btn-icon edit-task-btn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                    </svg>
+                  </a>
+                  <button class="btn-icon delete-task-btn" data-id="<%= task._id %>">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-state">
+              <p>No tasks found for this project. Click "Add Task" to create one.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-team">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Team Members</h3>
+        <button class="btn btn-sm" id="add-member-btn">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+          </svg>
+          Add Member
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="team-members-grid">
+          <% if (project.members && project.members.length > 0) { %>
+            <% project.members.forEach(member => { %>
+              <div class="team-member-card">
+                <div class="member-avatar">
+                  <% if (member.image) { %>
+                    <img src="<%= member.image %>" alt="<%= member.displayName %>">
+                  <% } else { %>
+                    <div class="avatar-placeholder"><%= member.displayName ? member.displayName.charAt(0) : '?' %></div>
+                  <% } %>
+                </div>
+                <div class="member-info">
+                  <h4 class="member-name"><%= member.displayName || 'Team Member' %></h4>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="no-members">No team members assigned to this project</div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gantt Chart Section -->
+  <div class="project-gantt">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Gantt Chart</h3>
+        <div class="card-actions">
+          <button class="btn btn-sm btn-outline" id="zoom-in-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+              <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"></path>
+            </svg>
+            Zoom In
+          </button>
+          <button class="btn btn-sm btn-outline" id="zoom-out-btn">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+              <path d="M7 9h5v1H7z"></path>
+            </svg>
+            Zoom Out
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="gantt-chart-container" id="ganttChartContainer">
+          <div class="gantt-chart-wrapper">
+            <table class="gantt-table">
+              <thead>
+                <tr>
+                  <th class="gantt-task-column">TASKS</th>
+                  <th class="gantt-month-column" id="month1">MONTH 1</th>
+                  <th class="gantt-month-column" id="month2">MONTH 2</th>
+                  <th class="gantt-month-column" id="month3">MONTH 3</th>
+                  <th class="gantt-month-column" id="month4">MONTH 4</th>
+                </tr>
+              </thead>
+              <tbody id="ganttChartBody">
+                <!-- Tasks will be inserted here by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <div class="gantt-legend">
+            <!-- Task owners/legend will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Task Confirmation Modal -->
+<div class="modal" id="delete-task-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Task</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <form id="delete-task-form" method="POST">
+        <button type="button" class="btn btn-secondary" id="cancel-delete-task">Cancel</button>
+        <button type="submit" class="btn btn-danger" id="confirm-delete-task">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Get tasks data from the server
+  const tasksData = <%- JSON.stringify(formattedTasks || []) %>;
+
+  // Convert string dates to Date objects
+  const tasks = tasksData.map(task => ({
+    ...task,
+    startDate: new Date(task.startDate),
+    endDate: new Date(task.endDate)
+  }));
+
+  // Find the earliest start date and latest end date
+  const startDates = tasks.map(task => task.startDate);
+  const endDates = tasks.map(task => task.endDate);
+  const minDate = new Date(Math.min.apply(null, startDates));
+  const maxDate = new Date(Math.max.apply(null, endDates));
+
+  // Calculate the total duration in months
+  const startMonth = minDate.getMonth();
+  const startYear = minDate.getFullYear();
+  const endMonth = maxDate.getMonth();
+  const endYear = maxDate.getFullYear();
+  const totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
+
+  // Update month headers
+  for (let i = 0; i < 4; i++) {
+    const monthDate = new Date(startYear, startMonth + i, 1);
+    const monthName = monthDate.toLocaleString('default', { month: 'long' });
+    const yearNum = monthDate.getFullYear();
+    document.getElementById(`month${i+1}`).textContent = `${monthName.toUpperCase()} ${yearNum}`;
+  }
+
+  // Generate task rows
+  const ganttChartBody = document.getElementById('ganttChartBody');
+  ganttChartBody.innerHTML = '';
+
+  // Create a map to track task owners and their colors
+  const taskOwners = new Map();
+  const colors = [
+    '#3b82f6', // Blue
+    '#10b981', // Green
+    '#f59e0b', // Yellow
+    '#ef4444', // Red
+    '#8b5cf6', // Purple
+    '#06b6d4', // Cyan
+    '#ec4899', // Pink
+    '#14b8a6'  // Teal
+  ];
+
+  // Assign colors to task owners
+  tasks.forEach(task => {
+    if (!taskOwners.has(task.assignee)) {
+      taskOwners.set(task.assignee, colors[taskOwners.size % colors.length]);
+    }
+  });
+
+  // Create task rows
+  tasks.forEach((task, index) => {
+    const row = document.createElement('tr');
+    row.className = 'gantt-task-row';
+
+    // Task name cell
+    const taskCell = document.createElement('td');
+    taskCell.className = 'gantt-task-cell';
+    taskCell.textContent = task.name;
+    row.appendChild(taskCell);
+
+    // Create timeline cells (one for each month)
+    for (let i = 0; i < 4; i++) {
+      const timelineCell = document.createElement('td');
+      timelineCell.className = 'gantt-timeline-cell';
+      row.appendChild(timelineCell);
+
+      // Check if task falls within this month
+      const monthDate = new Date(startYear, startMonth + i, 1);
+      const nextMonthDate = new Date(startYear, startMonth + i + 1, 0); // Last day of current month
+
+      // If task overlaps with this month
+      if (task.startDate <= nextMonthDate && task.endDate >= monthDate) {
+        // Calculate position and width
+        const monthStartDay = 1;
+        const monthEndDay = nextMonthDate.getDate();
+        const monthDuration = monthEndDay - monthStartDay + 1;
+
+        // Calculate task start and end positions within this month
+        let taskStartDay = task.startDate.getDate();
+        let taskEndDay = task.endDate.getDate();
+
+        // Adjust if task starts in previous month
+        if (task.startDate < monthDate) {
+          taskStartDay = 1;
+        }
+
+        // Adjust if task ends in next month
+        if (task.endDate > nextMonthDate) {
+          taskEndDay = monthEndDay;
+        }
+
+        // Calculate position and width as percentages
+        const startPercent = ((taskStartDay - 1) / monthDuration) * 100;
+        const widthPercent = ((taskEndDay - taskStartDay + 1) / monthDuration) * 100;
+
+        // Create the task bar
+        const taskBar = document.createElement('div');
+        taskBar.className = `gantt-bar`;
+
+        // Set status-based class
+        if (task.status === 'Completed') {
+          taskBar.classList.add('gantt-bar-completed');
+        } else if (task.status === 'In Progress') {
+          taskBar.classList.add('gantt-bar-in-progress');
+        } else if (task.status === 'Not Started') {
+          taskBar.classList.add('gantt-bar-not-started');
+        } else if (task.status === 'Delayed') {
+          taskBar.classList.add('gantt-bar-delayed');
+        } else if (task.status === 'Review') {
+          taskBar.classList.add('gantt-bar-review');
+        } else if (task.status === 'Milestone') {
+          taskBar.classList.add('gantt-bar-milestone');
+        }
+
+        // Set position and width
+        taskBar.style.left = `${startPercent}%`;
+        taskBar.style.width = `${widthPercent}%`;
+        taskBar.style.backgroundColor = taskOwners.get(task.assignee);
+
+        // Add task info
+        taskBar.textContent = `${task.progress}%`;
+        taskBar.title = `${task.name} (${task.assignee}) - ${task.progress}% complete`;
+
+        // Add to cell
+        timelineCell.appendChild(taskBar);
+      }
+    }
+
+    ganttChartBody.appendChild(row);
+  });
+
+  // Create legend
+  const legendContainer = document.querySelector('.gantt-legend');
+  legendContainer.innerHTML = '';
+
+  // Add task owners to legend
+  taskOwners.forEach((color, owner) => {
+    const legendItem = document.createElement('div');
+    legendItem.className = 'gantt-legend-item';
+
+    const colorBox = document.createElement('div');
+    colorBox.className = 'gantt-legend-color';
+    colorBox.style.backgroundColor = color;
+
+    const ownerName = document.createElement('span');
+    ownerName.textContent = owner;
+
+    legendItem.appendChild(colorBox);
+    legendItem.appendChild(ownerName);
+    legendContainer.appendChild(legendItem);
+  });
+
+  // Zoom functionality
+  let zoomLevel = 100;
+  const zoomStep = 20;
+  const minZoom = 60;
+  const maxZoom = 200;
+
+  document.getElementById('zoom-in-btn').addEventListener('click', function() {
+    if (zoomLevel < maxZoom) {
+      zoomLevel += zoomStep;
+      updateZoom();
+    }
+  });
+
+  document.getElementById('zoom-out-btn').addEventListener('click', function() {
+    if (zoomLevel > minZoom) {
+      zoomLevel -= zoomStep;
+      updateZoom();
+    }
+  });
+
+  function updateZoom() {
+    const container = document.querySelector('.gantt-chart-container');
+    container.style.width = `${zoomLevel}%`;
+  }
+});
+
+  // Delete project functionality
+  document.getElementById('delete-project-btn').addEventListener('click', function() {
+    document.getElementById('delete-project-modal').style.display = 'block';
+  });
+
+  document.getElementById('cancel-delete-project').addEventListener('click', function() {
+    document.getElementById('delete-project-modal').style.display = 'none';
+  });
+
+  document.querySelector('#delete-project-modal .modal-close').addEventListener('click', function() {
+    document.getElementById('delete-project-modal').style.display = 'none';
+  });
+
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('delete-project-modal');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+</script>
+
+<!-- Delete Project Modal -->
+<div class="modal" id="delete-project-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Project</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this project? This action cannot be undone.</p>
+      <form action="/projects/<%= project._id %>?_method=DELETE" method="POST" id="delete-project-form">
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-delete-project">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal" id="add-member-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add Team Member</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form action="/projects/<%= project._id %>" method="POST" id="add-member-form">
+        <input type="hidden" name="name" value="<%= project.name %>">
+        <input type="hidden" name="description" value="<%= project.description %>">
+        <input type="hidden" name="status" value="<%= project.status %>">
+        <input type="hidden" name="team" value="<%= project.team %>">
+        <input type="hidden" name="dueDate" value="<%= project.dueDate ? project.dueDate.toISOString().split('T')[0] : '' %>">
+        <input type="hidden" name="progress" value="<%= project.progress %>">
+
+        <div class="form-group">
+          <label for="members">Select Team Members</label>
+          <select name="members" id="members" class="form-control" multiple required>
+            <% if (users && users.length > 0) { %>
+              <% users.forEach(user => { %>
+                <% const isAlreadyMember = project.members && project.members.some(m => m._id && m._id.toString() === user._id.toString()); %>
+                <option value="<%= user._id %>" <%= isAlreadyMember ? 'selected' : '' %>><%= user.displayName %></option>
+              <% }); %>
+            <% } %>
+          </select>
+          <small class="form-text text-muted">Hold Ctrl (or Cmd on Mac) to select multiple members</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-add-member">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add member modal functionality
+  document.getElementById('add-member-btn').addEventListener('click', function() {
+    document.getElementById('add-member-modal').style.display = 'block';
+  });
+
+  document.getElementById('cancel-add-member').addEventListener('click', function() {
+    document.getElementById('add-member-modal').style.display = 'none';
+  });
+
+  document.querySelector('#add-member-modal .modal-close').addEventListener('click', function() {
+    document.getElementById('add-member-modal').style.display = 'none';
+  });
+
+  window.addEventListener('click', function(event) {
+    const modal = document.getElementById('add-member-modal');
+    if (event.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+  // Task Management
+  const addTaskBtn = document.getElementById('add-task-btn');
+  const deleteTaskBtns = document.querySelectorAll('.delete-task-btn');
+  const taskStatusCheckboxes = document.querySelectorAll('.task-status-checkbox');
+
+  // Add Task Button - Redirect to task creation page with project pre-selected
+  if (addTaskBtn) {
+    addTaskBtn.addEventListener('click', () => {
+      window.location.href = `/tasks/add?project=<%= project._id %>`;
+    });
+  }
+
+  // Delete Task Modal
+  const deleteTaskModal = document.getElementById('delete-task-modal');
+  const deleteTaskForm = document.getElementById('delete-task-form');
+  const cancelDeleteTaskBtn = document.getElementById('cancel-delete-task');
+  const confirmDeleteTaskBtn = document.getElementById('confirm-delete-task');
+  const closeDeleteTaskBtn = deleteTaskModal.querySelector('.modal-close');
+
+  // Delete Task Buttons
+  deleteTaskBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const taskId = btn.getAttribute('data-id');
+      deleteTaskForm.action = `/tasks/delete/${taskId}?redirect=/projects/<%= project._id %>`;
+      deleteTaskModal.style.display = 'block';
+    });
+  });
+
+  // Cancel Delete
+  cancelDeleteTaskBtn.addEventListener('click', () => {
+    deleteTaskModal.style.display = 'none';
+  });
+
+  // Close Modal
+  closeDeleteTaskBtn.addEventListener('click', () => {
+    deleteTaskModal.style.display = 'none';
+  });
+
+  // Close Modal when clicking outside
+  window.addEventListener('click', (event) => {
+    if (event.target === deleteTaskModal) {
+      deleteTaskModal.style.display = 'none';
+    }
+  });
+
+  // Task Status Checkboxes
+  taskStatusCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const taskId = checkbox.getAttribute('data-id');
+      const currentStatus = checkbox.getAttribute('data-status');
+      const newStatus = checkbox.checked ? 'Completed' : 'In Progress';
+
+      // Only update if status has changed
+      if (currentStatus !== newStatus) {
+        // Create a form to submit the status update
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/tasks/update/${taskId}?redirect=/projects/<%= project._id %>`;
+
+        // Add hidden fields for the task data
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status';
+        statusInput.value = newStatus;
+        form.appendChild(statusInput);
+
+        // Add other required fields
+        const titleInput = document.createElement('input');
+        titleInput.type = 'hidden';
+        titleInput.name = 'title';
+        titleInput.value = 'Task Title'; // This will be overwritten by the server
+        form.appendChild(titleInput);
+
+        const projectInput = document.createElement('input');
+        projectInput.type = 'hidden';
+        projectInput.name = 'project';
+        projectInput.value = '<%= project._id %>';
+        form.appendChild(projectInput);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+  });
+</script>

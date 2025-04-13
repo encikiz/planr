@@ -1,0 +1,80 @@
+<div class="content-header">
+  <h1>Edit Workload Assignment</h1>
+  <div class="content-header-actions">
+    <a href="/workload" class="btn btn-secondary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+      </svg>
+      Cancel
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Edit Workload Details</h2>
+  </div>
+  <div class="card-body">
+    <form action="/workload/update/<%= workload._id %>" method="POST">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="project">Project</label>
+          <select name="project" id="project" class="form-control" required>
+            <option value="">Select a project</option>
+            <% projects.forEach(project => { %>
+              <option value="<%= project._id %>" <%= workload.project._id.toString() === project._id.toString() ? 'selected' : '' %>>
+                <%= project.name %> (<%= project.status %>)
+              </option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="user">Team Member</label>
+          <select name="user" id="user" class="form-control" required>
+            <option value="<%= user._id %>" <%= workload.user._id.toString() === user._id.toString() ? 'selected' : '' %>>
+              Me (<%= user.displayName %>)
+            </option>
+            <% users.forEach(member => { %>
+              <% if (member._id.toString() !== user._id.toString()) { %>
+                <option value="<%= member._id %>" <%= workload.user._id.toString() === member._id.toString() ? 'selected' : '' %>>
+                  <%= member.displayName %>
+                </option>
+              <% } %>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" name="startDate" id="startDate" class="form-control" value="<%= new Date(workload.startDate).toISOString().split('T')[0] %>" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input type="date" name="endDate" id="endDate" class="form-control" value="<%= new Date(workload.endDate).toISOString().split('T')[0] %>" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select name="status" id="status" class="form-control">
+            <option value="Planned" <%= workload.status === 'Planned' ? 'selected' : '' %>>Planned</option>
+            <option value="In Progress" <%= workload.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+            <option value="Completed" <%= workload.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+            <option value="Delayed" <%= workload.status === 'Delayed' ? 'selected' : '' %>>Delayed</option>
+          </select>
+        </div>
+        
+        <div class="form-group form-group-full">
+          <label for="notes">Notes</label>
+          <textarea name="notes" id="notes" class="form-control" rows="3"><%= workload.notes || '' %></textarea>
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Update Workload</button>
+        <a href="/workload" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

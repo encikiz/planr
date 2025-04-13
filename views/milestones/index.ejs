@@ -1,0 +1,124 @@
+<div class="milestones-page">
+  <div class="page-header">
+    <h1 class="page-title">Project Milestones</h1>
+    <a href="/milestones/add" class="btn btn-primary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      Add Milestone
+    </a>
+  </div>
+
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>Monitor critical project milestones and ensure timely delivery. Create, track, and manage all project milestones efficiently.</p>
+    </div>
+  </div>
+
+  <!-- Project selector -->
+  <div class="card filter-card">
+    <div class="card-body">
+      <form action="/milestones" method="GET" class="project-filter">
+        <div class="form-group">
+          <label for="project-filter">Select Project</label>
+          <select id="project-filter" name="project" class="form-select" onchange="this.form.submit()">
+            <option value="all" <%= selectedProject === 'all' ? 'selected' : '' %>>All Projects</option>
+            <% projects.forEach(project => { %>
+              <option value="<%= project._id %>" <%= selectedProject == project._id ? 'selected' : '' %>>
+                <%= project.name %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="card timeline-card">
+    <div class="card-header">
+      <h3 class="card-title">Milestone Timeline</h3>
+    </div>
+    <div class="card-body">
+      <div class="timeline">
+        <% milestones.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(milestone => { %>
+          <div class="timeline-item">
+            <div class="timeline-marker <%= milestone.status.toLowerCase().replace(' ', '-') %>"></div>
+            <div class="timeline-date">
+              <%= new Date(milestone.date).toLocaleDateString() %>
+            </div>
+            <div class="timeline-content">
+              <div class="milestone-card">
+                <div class="milestone-header">
+                  <h4 class="milestone-title"><%= milestone.title %></h4>
+                  <span class="status-badge <%= milestone.status.toLowerCase().replace(' ', '-') %>">
+                    <%= milestone.status %>
+                  </span>
+                </div>
+                <div class="milestone-description">
+                  <p><%= milestone.description %></p>
+                </div>
+                <div class="milestone-meta">
+                  <div class="meta-item">
+                    <span class="meta-label">Project:</span>
+                    <span class="meta-value"><%= milestone.project ? milestone.project.name : 'Unknown Project' %></span>
+                  </div>
+                  <div class="meta-item">
+                    <span class="meta-label">Owner:</span>
+                    <span class="meta-value"><%= milestone.owner ? milestone.owner.displayName : 'Unassigned' %></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Milestones -->
+  <div class="card upcoming-card">
+    <div class="card-header">
+      <h3 class="card-title">Upcoming Milestones</h3>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Milestone</th>
+              <th>Project</th>
+              <th>Due Date</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% upcomingMilestones.forEach(milestone => { %>
+              <tr>
+                <td>
+                  <div class="milestone-info">
+                    <h4 class="milestone-name"><%= milestone.title %></h4>
+                    <p class="milestone-description"><%= milestone.description.substring(0, 50) %>...</p>
+                  </div>
+                </td>
+                <td><%= milestone.project ? milestone.project.name : 'Unknown Project' %></td>
+                <td><%= new Date(milestone.date).toLocaleDateString() %></td>
+                <td><%= milestone.owner ? milestone.owner.displayName : 'Unassigned' %></td>
+                <td>
+                  <span class="status-badge <%= milestone.status.toLowerCase().replace(' ', '-') %>">
+                    <%= milestone.status %>
+                  </span>
+                </td>
+                <td>
+                  <a href="/milestones/<%= milestone.id %>" class="btn btn-sm">Details</a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

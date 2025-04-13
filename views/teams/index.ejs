@@ -1,0 +1,121 @@
+<div class="teams-page">
+  <div class="page-header">
+    <h1 class="page-title">Teams</h1>
+    <a href="/teams/new/form" class="btn btn-primary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      New Team
+    </a>
+  </div>
+
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>Manage your project teams: assign members, track progress, and monitor performance.</p>
+    </div>
+  </div>
+
+  <!-- Teams Grid -->
+  <div class="teams-grid">
+    <% teams.forEach(team => { %>
+      <div class="team-card">
+        <div class="team-header">
+          <h3 class="team-title"><%= team.name %></h3>
+          <span class="badge <%= team.activeProjects > 0 ? 'active' : 'inactive' %>">
+            <%= team.activeProjects %> Active Projects
+          </span>
+        </div>
+        <div class="team-description">
+          <p><%= team.description %></p>
+        </div>
+        <div class="team-members">
+          <h4 class="section-title">Team Members</h4>
+          <div class="members-list">
+            <% if (team.members && team.members.length > 0) { %>
+              <% team.members.slice(0, 3).forEach(member => { %>
+                <div class="member-item">
+                  <div class="member-avatar">
+                    <% if (member.user && member.user.image) { %>
+                      <img src="<%= member.user.image %>" alt="<%= member.user.displayName %>">
+                    <% } else { %>
+                      <div class="avatar-placeholder"><%= member.user ? member.user.displayName.charAt(0) : '?' %></div>
+                    <% } %>
+                  </div>
+                  <div class="member-info">
+                    <h5 class="member-name"><%= member.user ? member.user.displayName : 'Unknown User' %></h5>
+                    <p class="member-role"><%= member.role %></p>
+                  </div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <div class="no-members">No team members yet</div>
+            <% } %>
+            <% if (team.members && team.members.length > 3) { %>
+              <div class="more-members">
+                + <%= team.members.length - 3 %> more members
+              </div>
+            <% } %>
+          </div>
+        </div>
+        <div class="team-footer">
+          <div class="team-meta">
+            <span class="meta-label">Created:</span>
+            <span class="meta-value"><%= new Date(team.createdAt).toLocaleDateString() %></span>
+          </div>
+          <a href="/teams/<%= team._id %>" class="btn btn-sm">View Team</a>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Team Performance -->
+  <div class="card performance-card">
+    <div class="card-header">
+      <h3 class="card-title">Team Performance</h3>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Projects</th>
+              <th>Completed</th>
+              <th>On Time Delivery</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% teamPerformance.forEach(team => { %>
+              <tr>
+                <td>
+                  <div class="team-info">
+                    <h4 class="team-name"><%= team.name %></h4>
+                  </div>
+                </td>
+                <td><%= team.totalProjects %></td>
+                <td><%= team.completedProjects %></td>
+                <td><%= team.onTimeDelivery %>%</td>
+                <td>
+                  <div class="progress-bar">
+                    <div class="progress <%= getPerformanceClass(team.performance) %>" style="width: <%= team.performance %>%"></div>
+                  </div>
+                  <span class="progress-text"><%= team.performance %>%</span>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getPerformanceClass(performance) {
+    if (performance >= 80) return 'excellent';
+    if (performance >= 60) return 'good';
+    if (performance >= 40) return 'average';
+    return 'poor';
+  }
+</script>

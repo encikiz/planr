@@ -1,0 +1,201 @@
+<div class="projects-page">
+  <div class="page-header">
+    <h1 class="page-title">Projects</h1>
+    <a href="/projects/new" class="btn btn-primary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      New Project
+    </a>
+  </div>
+
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>Create, manage, and track your projects. Monitor progress, timelines, and team assignments.</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card filter-card">
+    <div class="card-body">
+      <form method="GET" action="/projects" class="filter-form">
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label for="status-filter">Status</label>
+            <select id="status-filter" name="status" class="form-select" onchange="this.form.submit()">
+              <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All</option>
+              <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+              <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Completed</option>
+              <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+              <option value="on hold" <%= filters.status === 'on hold' ? 'selected' : '' %>>On Hold</option> <!-- Added On Hold status -->
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label for="team-filter">Team</label>
+            <select id="team-filter" name="team" class="form-select" onchange="this.form.submit()">
+              <option value="all" <%= filters.team === 'all' ? 'selected' : '' %>>All Teams</option>
+              <% teams.forEach(team => { %>
+                <option value="<%= team %>" <%= filters.team === team ? 'selected' : '' %>><%= team %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label for="sort-filter">Sort By</label>
+            <select id="sort-filter" name="sort" class="form-select" onchange="this.form.submit()">
+              <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Newest</option>
+              <option value="oldest" <%= filters.sort === 'oldest' ? 'selected' : '' %>>Oldest</option>
+              <option value="name" <%= filters.sort === 'name' ? 'selected' : '' %>>Name</option>
+              <option value="progress" <%= filters.sort === 'progress' ? 'selected' : '' %>>Progress</option>
+              <option value="dueDate" <%= filters.sort === 'dueDate' ? 'selected' : '' %>>Due Date</option> <!-- Added Due Date sort -->
+            </select>
+          </div>
+        </div>
+        <!-- No explicit submit button needed as selects trigger submit on change -->
+      </form>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  <div class="projects-grid">
+    <% projects.forEach(project => { %>
+      <div class="project-card">
+        <div class="project-header">
+          <h3 class="project-title"><%= project.name %></h3>
+          <span class="status-badge <%= project.status.toLowerCase() %>">
+            <%= project.status %>
+          </span>
+        </div>
+        <div class="project-description">
+          <p><%= project.description %></p>
+        </div>
+        <div class="project-progress">
+          <div class="progress-label">
+            <span>Progress</span>
+            <span><%= project.progress %>%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="--progress-width: <%= project.progress %>%;"></div>
+          </div>
+
+          <!-- Timeline Progress -->
+          <div class="progress-label mt-2">
+            <span>Timeline</span>
+            <span><%= project.daysRemaining %> days left</span>
+          </div>
+          <div class="progress-bar timeline-bar">
+            <div class="progress <% if (project.daysRemaining >= 14) { %>bg-success<% } else if (project.daysRemaining >= 7) { %>bg-warning<% } else { %>bg-danger<% } %>" style="--timeline-width: <%= project.timeProgress %>%;"></div>
+          </div>
+        </div>
+        <div class="project-meta">
+          <div class="meta-item">
+            <span class="meta-label">Team:</span>
+            <span class="meta-value"><%= project.team %></span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Due:</span>
+            <span class="meta-value"><%= project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'Not set' %></span>
+          </div>
+        </div>
+        <div class="project-footer">
+          <div class="project-members">
+            <% if (project.members && project.members.length > 0) { %>
+              <% project.members.slice(0, 3).forEach(member => { %>
+                <div class="member-avatar" title="<%= member.displayName || 'Team Member' %>">
+                  <% if (member.image) { %>
+                    <img src="<%= member.image %>" alt="<%= member.displayName %>">
+                  <% } else { %>
+                    <div class="avatar-placeholder"><%= member.displayName ? member.displayName.charAt(0) : '?' %></div>
+                  <% } %>
+                </div>
+              <% }); %>
+              <% if (project.members.length > 3) { %>
+                <div class="member-count">+<%= project.members.length - 3 %></div>
+              <% } %>
+            <% } else { %>
+              <div class="no-members">No members</div>
+            <% } %>
+          </div>
+          <div class="project-actions" style="display: flex; gap: 5px;"> <!-- Wrapper for buttons -->
+            <a href="/projects/<%= project._id %>" class="btn btn-sm view-details" onclick="event.preventDefault(); window.location.href='/projects/<%= project._id %>'">View Details</a>
+            <!-- Delete Button -->
+            <!-- We're now using a centralized form in the modal instead of individual forms -->
+            <button type="button" class="btn btn-sm btn-delete"
+                    data-project-id="<%= project._id %>"
+                    data-project-name="<%= project.name %>"
+                    onclick="showDeleteConfirmation(this)">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+              </svg>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Pagination (Removed static mockup) -->
+  <!-- TODO: Implement dynamic pagination if needed -->
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="delete-confirmation-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Delete Project</h3>
+      <button class="modal-close" type="button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete project: <span id="project-name-to-delete"></span>?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" id="cancel-delete">Cancel</button>
+      <form id="modal-delete-form" method="POST" style="display: inline;">
+        <!-- The action will be set dynamically in JavaScript -->
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit" class="btn btn-danger">Confirm</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Delete confirmation functionality
+  function showDeleteConfirmation(button) {
+    const projectId = button.getAttribute('data-project-id');
+    const projectName = button.getAttribute('data-project-name');
+
+    // Set the project name in the modal
+    document.getElementById('project-name-to-delete').textContent = projectName;
+
+    // Set up the delete form in the modal
+    const deleteForm = document.getElementById('modal-delete-form');
+    deleteForm.action = `/projects/${projectId}`;
+    console.log('Set form action to:', deleteForm.action);
+
+    // Show the modal
+    const modal = document.getElementById('delete-confirmation-modal');
+    modal.style.display = 'block';
+
+    // Set up the cancel button
+    const cancelButton = document.getElementById('cancel-delete');
+    cancelButton.onclick = function() {
+      modal.style.display = 'none';
+    };
+
+    // Close the modal when clicking the X
+    const closeButton = modal.querySelector('.modal-close');
+    closeButton.onclick = function() {
+      modal.style.display = 'none';
+    };
+
+    // Close the modal when clicking outside of it
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  }
+</script>

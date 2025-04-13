@@ -1,0 +1,89 @@
+<div class="add-milestone-page">
+  <div class="page-header">
+    <div class="header-left">
+      <a href="/milestones" class="btn btn-primary">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M19 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H19v-2z"></path>
+        </svg>
+        Back to Milestones
+      </a>
+      <h1 class="page-title"><%= title %></h1>
+    </div>
+  </div>
+
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>Create a new milestone to mark important events or deliverables in your project timeline. Milestones help track progress and keep your team aligned on project goals.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Milestone Details</h3>
+    </div>
+    <div class="card-body">
+      <form action="/milestones" method="POST">
+        <div class="form-grid">
+          <div class="form-group form-group-full">
+            <label for="title">Milestone Title</label>
+            <input type="text" id="title" name="title" class="form-control" required>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" class="form-control" rows="4"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="project">Project</label>
+            <select id="project" name="project" class="form-control" required>
+              <option value="" disabled selected>Select a project</option>
+              <% projects.forEach(project => { %>
+                <option value="<%= project._id %>"><%= project.name %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="owner">Owner</label>
+            <select id="owner" name="owner" class="form-control">
+              <option value="" selected>Unassigned</option>
+              <% users.forEach(user => { %>
+                <option value="<%= user._id %>"><%= user.displayName %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="date">Due Date</label>
+            <input type="date" id="date" name="date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="Upcoming" selected>Upcoming</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+              <option value="Delayed">Delayed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Create Milestone</button>
+          <a href="/milestones" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set default date to today
+    const today = new Date();
+    const dateInput = document.getElementById('date');
+    dateInput.value = today.toISOString().split('T')[0];
+  });
+</script>

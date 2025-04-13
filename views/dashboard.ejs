@@ -1,0 +1,476 @@
+<div class="dashboard">
+  <!-- Dashboard Description -->
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>Take immediate action and gain key insights into project performance.</p>
+    </div>
+  </div>
+
+  <!-- Quick Actions Section -->
+  <div class="quick-actions-section">
+    <div class="quick-actions-header">
+      <h3 class="quick-actions-title">
+        <svg viewBox="0 0 24 24">
+          <path d="M13 10h-2V8h2v2zm0-4h-2V2h2v4zm6 11l-4-3v2H5v2h10v2l4-3zm-9 1H8v-2h2v2zm-4 0H4v-2h2v2zm-4-7h2v2H2v-2zm0 4h2v2H2v-2zm0-8h2v2H2V7zm0-4h2v2H2V3zm4 0h2v2H6V3zm8 2h-2V3h2v2zM2 15h2v2H2v-2zm14-6h2v2h-2V9zm0-6h2v2h-2V3zm4 4h-2V5h2v2zm0 4h-2V9h2v2z"/>
+        </svg>
+        Quick Actions
+      </h3>
+    </div>
+    <div class="quick-actions">
+      <button class="quick-action-btn blue" onclick="location.href='/projects/new'">
+        <div class="quick-action-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+          </svg>
+        </div>
+        <div class="quick-action-content">
+          <h4 class="quick-action-title">New Project</h4>
+          <p class="quick-action-desc">Create a new project</p>
+        </div>
+      </button>
+
+      <button class="quick-action-btn green" onclick="location.href='/tasks/new'">
+        <div class="quick-action-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+          </svg>
+        </div>
+        <div class="quick-action-content">
+          <h4 class="quick-action-title">Add Task</h4>
+          <p class="quick-action-desc">Create a new task</p>
+        </div>
+      </button>
+
+      <button class="quick-action-btn amber" onclick="location.href='/team/invite'">
+        <div class="quick-action-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+          </svg>
+        </div>
+        <div class="quick-action-content">
+          <h4 class="quick-action-title">Invite Team</h4>
+          <p class="quick-action-desc">Add new team members</p>
+        </div>
+      </button>
+
+      <button class="quick-action-btn purple" onclick="location.href='/reports'">
+        <div class="quick-action-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path>
+          </svg>
+        </div>
+        <div class="quick-action-content">
+          <h4 class="quick-action-title">Reports</h4>
+          <p class="quick-action-desc">View project analytics</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Status Cards -->
+  <div class="status-cards">
+    <% dashboardData.statusCards.forEach(card => { %>
+      <div class="status-card">
+        <div class="status-card-icon <%= card.color %>">
+          <svg viewBox="0 0 24 24">
+            <path d="<%= card.icon %>"></path>
+          </svg>
+        </div>
+        <div class="status-card-content">
+          <h3 class="status-card-value"><%= card.value %></h3>
+          <p class="status-card-label"><%= card.title %></p>
+          <div class="status-card-trend <%= card.trend.isPositive ? 'positive' : 'negative' %>">
+            <svg viewBox="0 0 24 24">
+              <% if (card.trend.isPositive) { %>
+                <path d="M7 14l5-5 5 5z"></path>
+              <% } else { %>
+                <path d="M7 10l5 5 5-5z"></path>
+              <% } %>
+            </svg>
+            <span><%= card.trend.isPositive ? '+' : '-' %><%= card.trend.value %>% from last month</span>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon team-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Team Members</h3>
+        <p class="stat-value"><%= dashboardData.stats.teamMembers %></p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon project-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Active Projects</h3>
+        <p class="stat-value"><%= dashboardData.stats.activeProjects %></p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon task-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Completed Tasks</h3>
+        <p class="stat-value"><%= dashboardData.stats.completedTasks %></p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon approval-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Pending Approvals</h3>
+        <p class="stat-value"><%= dashboardData.stats.pendingApprovals %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Tasks Section -->
+  <div class="card my-tasks-section">
+    <div class="card-header">
+      <h3 class="card-title">My Tasks</h3>
+      <a href="/tasks" class="btn btn-sm">View All</a>
+    </div>
+    <div class="card-body" style="max-width: 100%; overflow: hidden;">
+      <div class="task-container">
+        <div class="scroll-arrow left" onclick="scrollTasks('left')">
+          <svg viewBox="0 0 24 24">
+            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
+          </svg>
+        </div>
+        <div class="scroll-arrow right" onclick="scrollTasks('right')">
+          <svg viewBox="0 0 24 24">
+            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
+          </svg>
+        </div>
+        <div class="task-list horizontal" style="width: 100%; max-width: 100%;">
+        <% dashboardData.myTasks.forEach(task => { %>
+          <div class="task-card <%= task.status.toLowerCase().replace(' ', '-') %>">
+            <h4 class="task-card-title">
+              <span class="task-priority priority-<%= task.priority ? task.priority.toLowerCase() : 'medium' %>"></span>
+              <%= task.title %>
+            </h4>
+            <p class="task-card-project"><%= task.project %></p>
+            <div class="progress-bar">
+              <div class="progress" style="width: <%= task.progress %>%"></div>
+            </div>
+            <div class="task-card-details">
+              <span class="status-badge <%= task.status.toLowerCase().replace(' ', '-') %>">
+                <%= task.status %>
+              </span>
+              <div class="task-card-due <%= task.dueDate && task.dueDate !== 'No due date' && new Date(task.dueDate) < new Date() ? 'overdue' : '' %>">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"></path>
+                </svg>
+                <%= task.dueDate %>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="card-header">
+        <h3 class="card-title">Project Progress</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="projectProgressChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="card-header">
+        <h3 class="card-title">Task Distribution</h3>
+      </div>
+      <div class="card-body">
+        <canvas id="taskDistributionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Projects -->
+  <div class="card recent-projects">
+    <div class="card-header">
+      <h3 class="card-title">Recent Projects</h3>
+      <a href="/projects" class="btn btn-sm">View All</a>
+    </div>
+
+    <!-- Sorting and Filtering Options -->
+    <div class="filter-options">
+      <form action="/" method="GET" class="filter-form">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="status-filter">Status:</label>
+            <select id="status-filter" name="status" class="form-select" onchange="this.form.submit()">
+              <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="active" <%= filters.status === 'active' ? 'selected' : '' %>>Active</option>
+              <option value="pending" <%= filters.status === 'pending' ? 'selected' : '' %>>Pending</option>
+              <option value="completed" <%= filters.status === 'completed' ? 'selected' : '' %>>Completed</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="team-filter">Team:</label>
+            <select id="team-filter" name="team" class="form-select" onchange="this.form.submit()">
+              <option value="all" <%= filters.team === 'all' ? 'selected' : '' %>>All Teams</option>
+              <% teams.forEach(team => { %>
+                <option value="<%= team %>" <%= filters.team === team ? 'selected' : '' %>><%= team %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="sort-by">Sort By:</label>
+            <select id="sort-by" name="sort" class="form-select" onchange="this.form.submit()">
+              <option value="default" <%= filters.sort === 'default' ? 'selected' : '' %>>Default</option>
+              <option value="name" <%= filters.sort === 'name' ? 'selected' : '' %>>Name</option>
+              <option value="progress" <%= filters.sort === 'progress' ? 'selected' : '' %>>Progress</option>
+              <option value="dueDate" <%= filters.sort === 'dueDate' ? 'selected' : '' %>>Due Date</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Status</th>
+              <th>Team</th>
+              <th>Progress</th>
+              <th>Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% dashboardData.recentProjects.forEach(project => { %>
+              <tr>
+                <td>
+                  <div class="project-info">
+                    <h4 class="project-name"><%= project.name %></h4>
+                    <p class="project-description"><%= project.description %></p>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge <%= project.status.toLowerCase() %>">
+                    <%= project.status %>
+                  </span>
+                </td>
+                <td><%= project.team %></td>
+                <td>
+                  <div class="progress-bar">
+                    <div class="progress" style="width: <%= project.progress %>%"></div>
+                  </div>
+                  <span class="progress-text"><%= project.progress %>%</span>
+                </td>
+                <td><%= project.dueDate %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="card recent-activity">
+    <div class="card-header">
+      <h3 class="card-title">Recent Activity</h3>
+      <a href="/activity" class="btn btn-sm">View All</a>
+    </div>
+    <div class="card-body">
+      <ul class="activity-list">
+        <% dashboardData.recentActivity.forEach(activity => { %>
+          <li class="activity-item">
+            <div class="activity-avatar">
+              <% if (activity.user.avatar) { %>
+                <img src="<%= activity.user.avatar %>" alt="<%= activity.user.name %>" onerror="this.onerror=null; this.innerHTML='<div class=\'fallback-avatar\'><%= activity.user.name.charAt(0) %></div>'; this.src='';">
+              <% } else { %>
+                <div class="fallback-avatar"><%= activity.user.name.charAt(0) %></div>
+              <% } %>
+            </div>
+            <div class="activity-content">
+              <div class="activity-header">
+                <span class="activity-user"><%= activity.user.name %></span>
+                <span class="activity-action"><%= activity.content %></span>
+                <span class="activity-target"><%= activity.target %></span>
+              </div>
+
+              <% if (activity.project) { %>
+                <div class="activity-project">
+                  <svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align: -1px;">
+                    <path fill="currentColor" d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path>
+                  </svg>
+                  <%= activity.project %>
+                </div>
+              <% } %>
+
+              <% if (activity.comment) { %>
+                <div class="activity-details">
+                  <%= activity.comment %>
+                </div>
+              <% } %>
+
+              <% if (activity.change) { %>
+                <div class="activity-details">
+                  <%= activity.change %>
+                </div>
+              <% } %>
+
+              <div class="activity-time">
+                <%= new Date(activity.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true }) %>
+              </div>
+            </div>
+
+            <div class="activity-icon <%= activity.type.replace('_', '-') %>">
+              <% if (activity.type === 'task_completed') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path>
+                </svg>
+              <% } else if (activity.type === 'comment_added') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"></path>
+                </svg>
+              <% } else if (activity.type === 'project_created') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                </svg>
+              <% } else if (activity.type === 'task_assigned') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"></path>
+                </svg>
+              <% } else if (activity.type === 'milestone_reached') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+                </svg>
+              <% } else if (activity.type === 'file_uploaded') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"></path>
+                </svg>
+              <% } else if (activity.type === 'task_updated') { %>
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                </svg>
+              <% } %>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Project Progress Chart
+  const projectProgressCtx = document.getElementById('projectProgressChart').getContext('2d');
+  const projectProgressData = {
+    labels: <%- JSON.stringify(dashboardData.projectProgress.map(p => p.name)) %>,
+    datasets: [
+      {
+        label: 'Completed',
+        backgroundColor: '#3b82f6',
+        data: <%- JSON.stringify(dashboardData.projectProgress.map(p => p.completed)) %>
+      },
+      {
+        label: 'Remaining',
+        backgroundColor: '#e5e7eb',
+        data: <%- JSON.stringify(dashboardData.projectProgress.map(p => p.remaining)) %>
+      }
+    ]
+  };
+
+  new Chart(projectProgressCtx, {
+    type: 'bar',
+    data: projectProgressData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: function(value) {
+              return value + '%';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Task Distribution Chart
+  const taskDistributionCtx = document.getElementById('taskDistributionChart').getContext('2d');
+  const taskDistributionData = {
+    labels: <%- JSON.stringify(dashboardData.taskDistribution.map(t => t.label)) %>,
+    datasets: [{
+      data: <%- JSON.stringify(dashboardData.taskDistribution.map(t => t.value)) %>,
+      backgroundColor: <%- JSON.stringify(dashboardData.taskDistribution.map(t => t.color)) %>,
+      borderWidth: 0
+    }]
+  };
+
+  new Chart(taskDistributionCtx, {
+    type: 'doughnut',
+    data: taskDistributionData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${percentage}% (${value} tasks)`;
+            }
+          }
+        }
+      },
+      cutout: '65%'
+    }
+  });
+</script>

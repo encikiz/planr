@@ -1,0 +1,161 @@
+<div class="milestone-detail">
+  <div class="page-header">
+    <div class="header-left">
+      <a href="/milestones" class="btn btn-primary">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M19 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H19v-2z"></path>
+        </svg>
+        Back to Milestones
+      </a>
+      <h1 class="page-title"><%= milestone.title %></h1>
+    </div>
+    <div class="header-right">
+      <a href="/milestones/edit/<%= milestone._id %>" class="btn btn-secondary">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+        </svg>
+        Edit
+      </a>
+    </div>
+  </div>
+
+  <div class="intro-card card">
+    <div class="card-body">
+      <p>This page shows the details of a specific milestone. You can track its status, update information, and collaborate with your team through comments.</p>
+    </div>
+  </div>
+
+  <div class="milestone-overview">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Milestone Overview</h3>
+        <span class="status-badge <%= milestone.status.toLowerCase().replace(' ', '-') %>">
+          <%= milestone.status %>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="overview-grid">
+          <div class="overview-item">
+            <h4 class="overview-label">Description</h4>
+            <p class="overview-value"><%= milestone.description %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Project</h4>
+            <p class="overview-value"><%= milestone.project ? milestone.project.name : 'Unknown Project' %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Due Date</h4>
+            <p class="overview-value"><%= new Date(milestone.date).toLocaleDateString() %></p>
+          </div>
+
+          <div class="overview-item">
+            <h4 class="overview-label">Owner</h4>
+            <p class="overview-value"><%= milestone.owner ? milestone.owner.displayName : 'Unassigned' %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="milestone-actions">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Actions</h3>
+      </div>
+      <div class="card-body">
+        <div class="actions-grid">
+          <% if (milestone.status === 'Upcoming') { %>
+            <form action="/milestones/<%= milestone._id %>/status" method="POST" style="display: inline;">
+              <input type="hidden" name="status" value="In Progress">
+              <button type="submit" class="btn btn-primary">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+                </svg>
+                Start Milestone
+              </button>
+            </form>
+          <% } else if (milestone.status === 'In Progress') { %>
+            <form action="/milestones/<%= milestone._id %>/status" method="POST" style="display: inline;">
+              <input type="hidden" name="status" value="Completed">
+              <button type="submit" class="btn btn-success">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                </svg>
+                Complete Milestone
+              </button>
+            </form>
+          <% } else if (milestone.status === 'Completed') { %>
+            <form action="/milestones/<%= milestone._id %>/status" method="POST" style="display: inline;">
+              <input type="hidden" name="status" value="In Progress">
+              <button type="submit" class="btn btn-secondary">
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+                </svg>
+                Reopen Milestone
+              </button>
+            </form>
+          <% } %>
+
+          <form action="/milestones/delete/<%= milestone._id %>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this milestone? This action cannot be undone.')">
+            <button type="submit" class="btn btn-danger">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+              </svg>
+              Delete Milestone
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="milestone-comments">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Comments</h3>
+      </div>
+      <div class="card-body">
+        <div class="comments-list">
+          <% if (milestone.comments && milestone.comments.length > 0) { %>
+            <% milestone.comments.forEach(comment => { %>
+              <div class="comment-item">
+                <div class="comment-avatar">
+                  <% if (comment.user && comment.user.image) { %>
+                    <img src="<%= comment.user.image %>" alt="<%= comment.user.displayName %>">
+                  <% } else { %>
+                    <div class="avatar-placeholder"><%= comment.user ? comment.user.displayName.charAt(0) : '?' %></div>
+                  <% } %>
+                </div>
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <h4 class="comment-author"><%= comment.user ? comment.user.displayName : 'Unknown User' %></h4>
+                    <span class="comment-date"><%= new Date(comment.createdAt).toLocaleString() %></span>
+                  </div>
+                  <div class="comment-body">
+                    <p><%= comment.text %></p>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-comments">
+              <p>No comments yet. Be the first to comment!</p>
+            </div>
+          <% } %>
+        </div>
+
+        <div class="comment-form">
+          <h4 class="form-title">Add Comment</h4>
+          <form action="/milestones/<%= milestone._id %>/comment" method="POST">
+            <div class="form-group">
+              <textarea name="text" class="form-control" rows="3" placeholder="Write your comment..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,299 @@
+<div class="content-header">
+  <h1>Tasks</h1>
+  <div class="content-header-actions">
+    <a href="/tasks/add" class="btn btn-primary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      Add Task
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title">Task Filters</h2>
+  </div>
+  <div class="card-body">
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label for="status-filter">Status</label>
+        <select id="status-filter" class="form-control">
+          <option value="all">All Statuses</option>
+          <option value="Not Started">Not Started</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="project-filter">Project</label>
+        <select id="project-filter" class="form-control">
+          <option value="all">All Projects</option>
+          <% projects.forEach(project => { %>
+            <option value="<%= project._id %>"><%= project.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="assignee-filter">Assignee</label>
+        <select id="assignee-filter" class="form-control">
+          <option value="all">All Assignees</option>
+          <option value="unassigned">Unassigned</option>
+          <% users.forEach(user => { %>
+            <option value="<%= user._id %>"><%= user.displayName %></option>
+          <% }); %>
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="priority-filter">Priority</label>
+        <select id="priority-filter" class="form-control">
+          <option value="all">All Priorities</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">All Tasks</h2>
+    <div class="card-actions">
+      <a href="/tasks/my-tasks" class="btn btn-sm btn-outline">My Tasks</a>
+    </div>
+  </div>
+  <div class="card-body">
+    <% if (tasks && tasks.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table task-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Project</th>
+              <th>Assignee</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% tasks.forEach(task => { %>
+              <tr class="task-row" 
+                  data-status="<%= task.status %>" 
+                  data-project="<%= task.project._id %>" 
+                  data-assignee="<%= task.assignedTo ? task.assignedTo._id : 'unassigned' %>"
+                  data-priority="<%= task.priority %>">
+                <td>
+                  <div class="task-title">
+                    <%= task.title %>
+                    <% if (task.description) { %>
+                      <span class="task-description-toggle" data-description="<%= task.description %>">
+                        <svg class="icon" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path>
+                        </svg>
+                      </span>
+                    <% } %>
+                  </div>
+                </td>
+                <td>
+                  <a href="/tasks/project/<%= task.project._id %>"><%= task.project.name %></a>
+                </td>
+                <td>
+                  <% if (task.assignedTo) { %>
+                    <div class="user-info">
+                      <% if (task.assignedTo.image) { %>
+                        <img src="<%= task.assignedTo.image %>" alt="<%= task.assignedTo.displayName %>" class="user-avatar">
+                      <% } else { %>
+                        <div class="user-avatar-placeholder">
+                          <%= task.assignedTo.displayName.charAt(0) %>
+                        </div>
+                      <% } %>
+                      <%= task.assignedTo.displayName %>
+                    </div>
+                  <% } else { %>
+                    <span class="unassigned">Unassigned</span>
+                  <% } %>
+                </td>
+                <td>
+                  <span class="status-badge status-<%= task.status.toLowerCase().replace(' ', '-') %>">
+                    <%= task.status %>
+                  </span>
+                </td>
+                <td>
+                  <span class="priority-badge priority-<%= task.priority.toLowerCase() %>">
+                    <%= task.priority %>
+                  </span>
+                </td>
+                <td>
+                  <% if (task.dueDate) { %>
+                    <%= new Date(task.dueDate).toLocaleDateString() %>
+                    <% 
+                      const today = new Date();
+                      const dueDate = new Date(task.dueDate);
+                      const diffTime = dueDate - today;
+                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    %>
+                    <% if (diffDays < 0 && task.status !== 'Completed') { %>
+                      <span class="overdue-badge">Overdue</span>
+                    <% } else if (diffDays <= 3 && diffDays >= 0 && task.status !== 'Completed') { %>
+                      <span class="due-soon-badge">Due soon</span>
+                    <% } %>
+                  <% } else { %>
+                    -
+                  <% } %>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <a href="/tasks/edit/<%= task._id %>" class="btn-icon">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                      </svg>
+                    </a>
+                    <button class="btn-icon delete-task" data-id="<%= task._id %>">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24">
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+        </svg>
+        <p>No tasks found. Create your first task using the button above.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Task Description Modal -->
+<div class="modal" id="description-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Task Description</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p id="task-description-content"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="delete-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirm Deletion</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+      <form id="delete-form" action="/tasks/delete/" method="POST">
+        <!-- Hidden input for task ID will be added dynamically -->
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancel-delete">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Task filtering
+    const statusFilter = document.getElementById('status-filter');
+    const projectFilter = document.getElementById('project-filter');
+    const assigneeFilter = document.getElementById('assignee-filter');
+    const priorityFilter = document.getElementById('priority-filter');
+    const taskRows = document.querySelectorAll('.task-row');
+    
+    function applyFilters() {
+      const statusValue = statusFilter.value;
+      const projectValue = projectFilter.value;
+      const assigneeValue = assigneeFilter.value;
+      const priorityValue = priorityFilter.value;
+      
+      taskRows.forEach(row => {
+        const rowStatus = row.getAttribute('data-status');
+        const rowProject = row.getAttribute('data-project');
+        const rowAssignee = row.getAttribute('data-assignee');
+        const rowPriority = row.getAttribute('data-priority');
+        
+        const statusMatch = statusValue === 'all' || rowStatus === statusValue;
+        const projectMatch = projectValue === 'all' || rowProject === projectValue;
+        const assigneeMatch = assigneeValue === 'all' || rowAssignee === assigneeValue;
+        const priorityMatch = priorityValue === 'all' || rowPriority === priorityValue;
+        
+        if (statusMatch && projectMatch && assigneeMatch && priorityMatch) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    statusFilter.addEventListener('change', applyFilters);
+    projectFilter.addEventListener('change', applyFilters);
+    assigneeFilter.addEventListener('change', applyFilters);
+    priorityFilter.addEventListener('change', applyFilters);
+    
+    // Task description modal
+    const descriptionModal = document.getElementById('description-modal');
+    const descriptionContent = document.getElementById('task-description-content');
+    const descriptionToggles = document.querySelectorAll('.task-description-toggle');
+    const modalCloseButtons = document.querySelectorAll('.modal-close');
+    
+    descriptionToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const description = toggle.getAttribute('data-description');
+        descriptionContent.textContent = description;
+        descriptionModal.style.display = 'block';
+      });
+    });
+    
+    modalCloseButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        descriptionModal.style.display = 'none';
+        deleteModal.style.display = 'none';
+      });
+    });
+    
+    // Delete task confirmation
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteButtons = document.querySelectorAll('.delete-task');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+    const deleteForm = document.getElementById('delete-form');
+    
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const taskId = button.getAttribute('data-id');
+        deleteForm.action = `/tasks/delete/${taskId}`;
+        deleteModal.style.display = 'block';
+      });
+    });
+    
+    cancelDeleteBtn.addEventListener('click', () => {
+      deleteModal.style.display = 'none';
+    });
+    
+    confirmDeleteBtn.addEventListener('click', () => {
+      deleteForm.submit();
+    });
+  });
+</script>

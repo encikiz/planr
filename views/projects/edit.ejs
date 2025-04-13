@@ -1,0 +1,77 @@
+<div class="edit-project-page">
+  <div class="page-header">
+    <div class="header-left">
+      <a href="/projects/<%= project._id %>" class="back-link">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+        </svg>
+        Back to Project
+      </a>
+      <h1 class="page-title"><%= title %></h1>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form action="/projects/<%= project._id %>" method="POST">
+        <div class="form-group">
+          <label for="name">Project Name</label>
+          <input type="text" id="name" name="name" class="form-control" value="<%= project.name %>" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" class="form-control" rows="4" required><%= project.description %></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="Active" <%= project.status === 'Active' ? 'selected' : '' %>>Active</option>
+              <option value="Pending" <%= project.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+              <option value="Completed" <%= project.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+              <option value="On Hold" <%= project.status === 'On Hold' ? 'selected' : '' %>>On Hold</option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="team">Team</label>
+            <select id="team" name="team" class="form-control" required>
+              <% teams.forEach(team => { %>
+                <option value="<%= team.name %>" <%= project.team === team.name ? 'selected' : '' %>><%= team.name %></option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="dueDate">Due Date</label>
+            <input type="date" id="dueDate" name="dueDate" class="form-control" value="<%= project.dueDate ? project.dueDate.toISOString().split('T')[0] : '' %>" required>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="progress">Progress (%)</label>
+            <input type="number" id="progress" name="progress" class="form-control" min="0" max="100" value="<%= project.progress %>" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="members">Team Members</label>
+          <select id="members" name="members" class="form-control" multiple>
+            <% users.forEach(user => { %>
+              <option value="<%= user._id %>" <%= project.members && project.members.some(m => m.toString() === user._id.toString()) ? 'selected' : '' %>><%= user.displayName %></option>
+            <% }); %>
+          </select>
+          <small class="form-text text-muted">Hold Ctrl (or Cmd on Mac) to select multiple members</small>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="location.href='/projects/<%= project._id %>'">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

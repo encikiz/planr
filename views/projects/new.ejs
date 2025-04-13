@@ -1,0 +1,63 @@
+<div class="new-project-page">
+  <div class="page-header">
+    <h1 class="page-title"><%= title %></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form action="/projects" method="POST">
+        <div class="form-grid">
+          <div class="form-group form-group-full">
+            <label for="projectName">Project Name</label>
+            <input type="text" id="projectName" name="name" class="form-control" required>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label for="projectDescription">Description</label>
+            <textarea id="projectDescription" name="description" class="form-control" rows="4" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="projectStatus">Status</label>
+            <select id="projectStatus" name="status" class="form-select" required>
+              <option value="Pending" selected>Pending</option>
+              <option value="Active">Active</option>
+              <option value="Completed">Completed</option>
+              <option value="On Hold">On Hold</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="projectTeam">Team</label>
+            <select id="projectTeam" name="team" class="form-select" required>
+              <option value="" disabled selected>Select a team</option>
+              <% teams.forEach(team => { %>
+                <option value="<%= team %>"><%= team %></option>
+              <% }); %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="projectDueDate">Due Date</label>
+            <input type="date" id="projectDueDate" name="dueDate" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="projectMembers">Assign Members</label>
+            <select id="projectMembers" name="members" class="form-select" multiple required>
+              <% users.forEach(user => { %>
+                <option value="<%= user.id %>"><%= user.name %></option>
+              <% }); %>
+            </select>
+            <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple members.</small>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 20px; text-align: right;">
+          <a href="/projects" class="btn btn-secondary" style="margin-right: 10px;">Cancel</a>
+          <button type="submit" class="btn btn-primary">Create Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

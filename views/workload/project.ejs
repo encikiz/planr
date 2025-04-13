@@ -1,0 +1,150 @@
+<div class="content-header">
+  <h1><%= projectDetails.name %> Workload</h1>
+  <div class="content-header-actions">
+    <a href="/workload" class="btn btn-secondary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+      </svg>
+      Back to Workload
+    </a>
+  </div>
+</div>
+
+<div class="project-profile-card mb-4">
+  <div class="project-profile-header">
+    <div class="project-icon">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z"></path>
+      </svg>
+    </div>
+    <div class="project-profile-info">
+      <h2><%= projectDetails.name %></h2>
+      <div class="project-meta">
+        <span class="badge badge-<%= projectDetails.status.toLowerCase() %>"><%= projectDetails.status %></span>
+        <span class="project-team"><%= projectDetails.team %></span>
+      </div>
+    </div>
+  </div>
+  <div class="project-profile-stats">
+    <div class="project-profile-stat">
+      <div class="stat-value"><%= totalDays %></div>
+      <div class="stat-label">Total Days Allocated</div>
+    </div>
+    <div class="project-profile-stat">
+      <div class="stat-value"><%= userWorkloads.length %></div>
+      <div class="stat-label">Team Members</div>
+    </div>
+    <div class="project-profile-stat">
+      <div class="stat-value"><%= workloads.filter(w => w.status === 'In Progress').length %></div>
+      <div class="stat-label">Active Assignments</div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title">Team Member Allocations</h2>
+  </div>
+  <div class="card-body">
+    <div class="chart-container">
+      <canvas id="userAllocationChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">Workload Timeline</h2>
+  </div>
+  <div class="card-body">
+    <% if (workloads && workloads.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Team Member</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Days Allocated</th>
+              <th>Status</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% workloads.forEach(workload => { %>
+              <tr class="workload-row <%= workload.status.toLowerCase() %>">
+                <td>
+                  <div class="user-info">
+                    <% if (workload.user.image) { %>
+                      <img src="<%= workload.user.image %>" alt="<%= workload.user.displayName %>" class="user-avatar">
+                    <% } else { %>
+                      <div class="user-avatar-placeholder">
+                        <%= workload.user.firstName.charAt(0) %>
+                      </div>
+                    <% } %>
+                    <a href="/workload/user/<%= workload.user._id %>"><%= workload.user.displayName %></a>
+                  </div>
+                </td>
+                <td><%= new Date(workload.startDate).toLocaleDateString() %></td>
+                <td><%= new Date(workload.endDate).toLocaleDateString() %></td>
+                <td><%= workload.daysAllocated %> days</td>
+                <td>
+                  <span class="status-badge status-<%= workload.status.toLowerCase() %>">
+                    <%= workload.status %>
+                  </span>
+                </td>
+                <td><%= workload.notes || '-' %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24">
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+        </svg>
+        <p>No workload assignments found for this project.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Prepare chart data
+    const userWorkloads = <%- JSON.stringify(userWorkloads || []) %>;
+    
+    if (userWorkloads.length > 0) {
+      // Create user allocation chart
+      const ctx = document.getElementById('userAllocationChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: userWorkloads.map(uw => uw.user.displayName),
+          datasets: [{
+            label: 'Days Allocated',
+            data: userWorkloads.map(uw => uw.totalDays),
+            backgroundColor: '#4285F4',
+            borderColor: '#3367D6',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Days'
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+</script>

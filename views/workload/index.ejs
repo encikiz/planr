@@ -1,0 +1,425 @@
+<div class="content-header">
+  <h1>Workload Tracking</h1>
+  <div class="content-header-actions">
+    <button class="btn btn-primary" id="add-workload-btn">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      Add Workload
+    </button>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-title">Team Workload Overview</h2>
+    <div class="card-actions">
+      <div class="filter-dropdown">
+        <select id="workload-filter" class="form-control">
+          <option value="all">All Workloads</option>
+          <option value="current">Current Workloads</option>
+          <option value="upcoming">Upcoming Workloads</option>
+          <option value="completed">Completed Workloads</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <% if (workloads && workloads.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Team Member</th>
+              <th>Project</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Days Allocated</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% workloads.forEach(workload => { %>
+              <tr class="workload-row <%= workload.status.toLowerCase() %>">
+                <td>
+                  <div class="user-info">
+                    <% if (workload.user.image) { %>
+                      <img src="<%= workload.user.image %>" alt="<%= workload.user.displayName %>" class="user-avatar">
+                    <% } else { %>
+                      <div class="user-avatar-placeholder">
+                        <%= workload.user.firstName.charAt(0) %>
+                      </div>
+                    <% } %>
+                    <a href="/workload/user/<%= workload.user._id %>"><%= workload.user.displayName %></a>
+                  </div>
+                </td>
+                <td>
+                  <a href="/workload/project/<%= workload.project._id %>"><%= workload.project.name %></a>
+                  <span class="badge badge-<%= workload.project.status.toLowerCase() %>"><%= workload.project.status %></span>
+                </td>
+                <td><%= new Date(workload.startDate).toLocaleDateString() %></td>
+                <td><%= new Date(workload.endDate).toLocaleDateString() %></td>
+                <td><%= workload.daysAllocated %> days</td>
+                <td>
+                  <span class="status-badge status-<%= workload.status.toLowerCase() %>">
+                    <%= workload.status %>
+                  </span>
+                </td>
+                <td>
+                  <div class="table-actions">
+                    <a href="/workload/edit/<%= workload._id %>" class="btn-icon">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                      </svg>
+                    </a>
+                    <button class="btn-icon delete-workload" data-id="<%= workload._id %>">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <svg class="empty-state-icon" viewBox="0 0 24 24">
+          <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+        </svg>
+        <p>No workload assignments found. Add your first workload assignment using the button above.</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-title">Workload by Team Member</h2>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <canvas id="userWorkloadChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-title">Workload by Project</h2>
+      </div>
+      <div class="card-body">
+        <div class="chart-container">
+          <canvas id="projectWorkloadChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Workload Modal -->
+<div class="modal" id="workload-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add Workload Assignment</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form action="/workload" method="POST" id="workload-form">
+        <div class="form-group">
+          <label for="project">Project</label>
+          <select name="project" id="project" class="form-control" required>
+            <option value="">Select a project</option>
+            <% projects.forEach(project => { %>
+              <option value="<%= project._id %>"><%= project.name %> (<%= project.status %>)</option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="user">Team Member</label>
+          <select name="user" id="user" class="form-control" required>
+            <option value="<%= user._id %>">Me (<%= user.displayName %>)</option>
+            <% users.forEach(member => { %>
+              <% if (member._id.toString() !== user._id.toString()) { %>
+                <option value="<%= member._id %>"><%= member.displayName %></option>
+              <% } %>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" name="startDate" id="startDate" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">End Date</label>
+          <input type="date" name="endDate" id="endDate" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select name="status" id="status" class="form-control">
+            <option value="Planned">Planned</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Delayed">Delayed</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancel-workload">Cancel</button>
+      <button class="btn btn-primary" id="save-workload">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="delete-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirm Deletion</h3>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete this workload assignment? This action cannot be undone.</p>
+      <form id="delete-form" action="/workload/delete/" method="POST">
+        <!-- Hidden input for workload ID will be added dynamically -->
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="cancel-delete">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const workloadModal = document.getElementById('workload-modal');
+    const addWorkloadBtn = document.getElementById('add-workload-btn');
+    const modalClose = document.querySelectorAll('.modal-close');
+    const cancelWorkloadBtn = document.getElementById('cancel-workload');
+    const saveWorkloadBtn = document.getElementById('save-workload');
+    const workloadForm = document.getElementById('workload-form');
+    
+    // Delete modal
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteButtons = document.querySelectorAll('.delete-workload');
+    const cancelDeleteBtn = document.getElementById('cancel-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+    const deleteForm = document.getElementById('delete-form');
+    
+    // Filter functionality
+    const workloadFilter = document.getElementById('workload-filter');
+    const workloadRows = document.querySelectorAll('.workload-row');
+    
+    // Show workload modal
+    addWorkloadBtn.addEventListener('click', () => {
+      workloadModal.style.display = 'block';
+      
+      // Set default dates
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+      
+      document.getElementById('startDate').value = today.toISOString().split('T')[0];
+      document.getElementById('endDate').value = nextWeek.toISOString().split('T')[0];
+    });
+    
+    // Close modals
+    modalClose.forEach(closeBtn => {
+      closeBtn.addEventListener('click', () => {
+        workloadModal.style.display = 'none';
+        deleteModal.style.display = 'none';
+      });
+    });
+    
+    // Cancel workload
+    cancelWorkloadBtn.addEventListener('click', () => {
+      workloadModal.style.display = 'none';
+    });
+    
+    // Save workload
+    saveWorkloadBtn.addEventListener('click', () => {
+      // Validate form
+      if (workloadForm.checkValidity()) {
+        workloadForm.submit();
+      } else {
+        // Trigger HTML5 validation
+        const submitButton = document.createElement('button');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        workloadForm.appendChild(submitButton);
+        submitButton.click();
+        workloadForm.removeChild(submitButton);
+      }
+    });
+    
+    // Show delete confirmation
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const workloadId = button.getAttribute('data-id');
+        deleteForm.action = `/workload/delete/${workloadId}`;
+        deleteModal.style.display = 'block';
+      });
+    });
+    
+    // Cancel delete
+    cancelDeleteBtn.addEventListener('click', () => {
+      deleteModal.style.display = 'none';
+    });
+    
+    // Confirm delete
+    confirmDeleteBtn.addEventListener('click', () => {
+      deleteForm.submit();
+    });
+    
+    // Filter workloads
+    workloadFilter.addEventListener('change', () => {
+      const filterValue = workloadFilter.value;
+      const today = new Date();
+      
+      workloadRows.forEach(row => {
+        switch (filterValue) {
+          case 'all':
+            row.style.display = '';
+            break;
+          case 'current':
+            if (row.classList.contains('in progress')) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+            break;
+          case 'upcoming':
+            if (row.classList.contains('planned')) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+            break;
+          case 'completed':
+            if (row.classList.contains('completed')) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+            break;
+        }
+      });
+    });
+    
+    // Prepare chart data
+    const workloads = <%- JSON.stringify(workloads || []) %>;
+    
+    // Process data for charts
+    if (workloads.length > 0) {
+      // User workload data
+      const userWorkloadData = {};
+      workloads.forEach(workload => {
+        const userName = workload.user.displayName;
+        if (!userWorkloadData[userName]) {
+          userWorkloadData[userName] = 0;
+        }
+        userWorkloadData[userName] += workload.daysAllocated;
+      });
+      
+      // Project workload data
+      const projectWorkloadData = {};
+      workloads.forEach(workload => {
+        const projectName = workload.project.name;
+        if (!projectWorkloadData[projectName]) {
+          projectWorkloadData[projectName] = 0;
+        }
+        projectWorkloadData[projectName] += workload.daysAllocated;
+      });
+      
+      // Create user workload chart
+      const userCtx = document.getElementById('userWorkloadChart').getContext('2d');
+      new Chart(userCtx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(userWorkloadData),
+          datasets: [{
+            label: 'Days Allocated',
+            data: Object.values(userWorkloadData),
+            backgroundColor: '#4285F4',
+            borderColor: '#3367D6',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Days'
+              }
+            }
+          }
+        }
+      });
+      
+      // Create project workload chart
+      const projectCtx = document.getElementById('projectWorkloadChart').getContext('2d');
+      new Chart(projectCtx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(projectWorkloadData),
+          datasets: [{
+            data: Object.values(projectWorkloadData),
+            backgroundColor: [
+              '#4285F4', // Google Blue
+              '#EA4335', // Google Red
+              '#FBBC05', // Google Yellow
+              '#34A853', // Google Green
+              '#5F6368', // Google Grey
+              '#8ab4f8', // Light Blue
+              '#f28b82', // Light Red
+              '#fdd663', // Light Yellow
+              '#81c995', // Light Green
+              '#dadce0'  // Light Grey
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  return `${label}: ${value} days`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  });
+</script>

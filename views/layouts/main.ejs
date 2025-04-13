@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planr | <%= title %></title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Comfortaa:wght@700&family=Fredoka+One&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- Close button for mobile view -->
+      <button class="close-sidebar" id="close-sidebar">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+        </svg>
+      </button>
+      <div class="sidebar-header">
+        <h1 class="logo">
+          <span class="logo-letter p">P</span>
+          <span class="logo-letter l">l</span>
+          <span class="logo-letter a">a</span>
+          <span class="logo-letter n">n</span>
+          <span class="logo-letter r">r</span>
+        </h1>
+        <p class="tagline">Get Organized</p>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="/" class="<%= title === 'Dashboard' ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path>
+              </svg>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/projects" class="<%= title === 'Projects' ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z"></path>
+              </svg>
+              Projects
+            </a>
+          </li>
+          <li>
+            <a href="/teams" class="<%= title === 'Teams' ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path>
+              </svg>
+              Teams
+            </a>
+          </li>
+          <li>
+            <a href="/milestones" class="<%= title === 'Milestones' ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+              </svg>
+              Milestones
+            </a>
+          </li>
+          <li>
+            <a href="/workload" class="<%= title.includes('Workload') ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"></path>
+              </svg>
+              Workload Tracking
+            </a>
+          </li>
+          <li>
+            <a href="/tasks" class="<%= title.includes('Task') ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path>
+              </svg>
+              Tasks
+            </a>
+          </li>
+          <li>
+            <a href="/availability" class="<%= title.includes('Availability') || title.includes('Resource') ? 'active' : '' %>">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path>
+              </svg>
+              Resource Availability
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menu-toggle">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+            </svg>
+          </button>
+          <h2 class="page-title"><%= title %></h2>
+        </div>
+        <div class="header-right">
+          <div class="search-box">
+            <input type="text" placeholder="Search...">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+            </svg>
+          </div>
+          <div class="user-profile">
+            <% if (user && user.image) { %>
+              <img src="<%= user.image %>" alt="<%= user.displayName %>" class="avatar">
+            <% } else { %>
+              <div class="avatar-placeholder">
+                <% if (user) { %>
+                  <%= user.firstName.charAt(0) %>
+                <% } else { %>
+                  G
+                <% } %>
+              </div>
+            <% } %>
+            <span class="username">
+              <% if (user) { %>
+                <%= user.displayName %>
+                <% if (user.isGuest) { %>
+                  <span class="guest-badge">Guest</span>
+                <% } %>
+              <% } else { %>
+                Guest User
+              <% } %>
+            </span>
+          </div>
+          <a href="/auth/logout" class="btn btn-logout" title="Logout">
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"></path>
+            </svg>
+            <span class="logout-text">Logout</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content">
+        <%- body %>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>Planr © 2025 | Developed by Hafizan.</p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmationModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="confirmationModalTitle">Confirm Action</h3>
+        <button class="modal-close" onclick="closeConfirmationModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmationModalMessage">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+        <button type="button" id="confirmActionButton" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="/js/main.js"></script>
+</body>
+</html>

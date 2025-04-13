@@ -1,0 +1,257 @@
+<div class="content-header">
+  <h1>My Tasks</h1>
+  <div class="content-header-actions">
+    <a href="/tasks/add" class="btn btn-primary">
+      <svg class="icon" viewBox="0 0 24 24">
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+      </svg>
+      Add Task
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-title">Not Started</h2>
+      </div>
+      <div class="card-body">
+        <div class="task-list">
+          <% 
+            const notStartedTasks = tasks.filter(task => task.status === 'Not Started');
+            if (notStartedTasks.length > 0) {
+          %>
+            <% notStartedTasks.forEach(task => { %>
+              <div class="task-card">
+                <div class="task-card-header">
+                  <h3 class="task-card-title"><%= task.title %></h3>
+                  <span class="priority-badge priority-<%= task.priority.toLowerCase() %>">
+                    <%= task.priority %>
+                  </span>
+                </div>
+                <div class="task-card-project">
+                  <a href="/tasks/project/<%= task.project._id %>"><%= task.project.name %></a>
+                </div>
+                <% if (task.description) { %>
+                  <div class="task-card-description">
+                    <%= task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description %>
+                  </div>
+                <% } %>
+                <div class="task-card-footer">
+                  <% if (task.dueDate) { %>
+                    <div class="task-card-due-date">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path>
+                      </svg>
+                      <%= new Date(task.dueDate).toLocaleDateString() %>
+                      <% 
+                        const today = new Date();
+                        const dueDate = new Date(task.dueDate);
+                        const diffTime = dueDate - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                      %>
+                      <% if (diffDays < 0) { %>
+                        <span class="overdue-badge">Overdue</span>
+                      <% } else if (diffDays <= 3 && diffDays >= 0) { %>
+                        <span class="due-soon-badge">Due soon</span>
+                      <% } %>
+                    </div>
+                  <% } %>
+                  <div class="task-card-actions">
+                    <a href="/tasks/edit/<%= task._id %>" class="btn-icon">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-task-list">
+              <p>No tasks in this status</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-title">In Progress</h2>
+      </div>
+      <div class="card-body">
+        <div class="task-list">
+          <% 
+            const inProgressTasks = tasks.filter(task => task.status === 'In Progress');
+            if (inProgressTasks.length > 0) {
+          %>
+            <% inProgressTasks.forEach(task => { %>
+              <div class="task-card">
+                <div class="task-card-header">
+                  <h3 class="task-card-title"><%= task.title %></h3>
+                  <span class="priority-badge priority-<%= task.priority.toLowerCase() %>">
+                    <%= task.priority %>
+                  </span>
+                </div>
+                <div class="task-card-project">
+                  <a href="/tasks/project/<%= task.project._id %>"><%= task.project.name %></a>
+                </div>
+                <% if (task.description) { %>
+                  <div class="task-card-description">
+                    <%= task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description %>
+                  </div>
+                <% } %>
+                <div class="task-card-footer">
+                  <% if (task.dueDate) { %>
+                    <div class="task-card-due-date">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path>
+                      </svg>
+                      <%= new Date(task.dueDate).toLocaleDateString() %>
+                      <% 
+                        const today = new Date();
+                        const dueDate = new Date(task.dueDate);
+                        const diffTime = dueDate - today;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                      %>
+                      <% if (diffDays < 0) { %>
+                        <span class="overdue-badge">Overdue</span>
+                      <% } else if (diffDays <= 3 && diffDays >= 0) { %>
+                        <span class="due-soon-badge">Due soon</span>
+                      <% } %>
+                    </div>
+                  <% } %>
+                  <div class="task-card-actions">
+                    <a href="/tasks/edit/<%= task._id %>" class="btn-icon">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-task-list">
+              <p>No tasks in this status</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-title">Completed</h2>
+      </div>
+      <div class="card-body">
+        <div class="task-list">
+          <% 
+            const completedTasks = tasks.filter(task => task.status === 'Completed');
+            if (completedTasks.length > 0) {
+          %>
+            <% completedTasks.forEach(task => { %>
+              <div class="task-card completed">
+                <div class="task-card-header">
+                  <h3 class="task-card-title"><%= task.title %></h3>
+                  <span class="priority-badge priority-<%= task.priority.toLowerCase() %>">
+                    <%= task.priority %>
+                  </span>
+                </div>
+                <div class="task-card-project">
+                  <a href="/tasks/project/<%= task.project._id %>"><%= task.project.name %></a>
+                </div>
+                <% if (task.description) { %>
+                  <div class="task-card-description">
+                    <%= task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description %>
+                  </div>
+                <% } %>
+                <div class="task-card-footer">
+                  <% if (task.dueDate) { %>
+                    <div class="task-card-due-date">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path>
+                      </svg>
+                      <%= new Date(task.dueDate).toLocaleDateString() %>
+                    </div>
+                  <% } %>
+                  <div class="task-card-actions">
+                    <a href="/tasks/edit/<%= task._id %>" class="btn-icon">
+                      <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="empty-task-list">
+              <p>No tasks in this status</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">On Hold Tasks</h2>
+  </div>
+  <div class="card-body">
+    <div class="task-list horizontal">
+      <% 
+        const onHoldTasks = tasks.filter(task => task.status === 'On Hold');
+        if (onHoldTasks.length > 0) {
+      %>
+        <% onHoldTasks.forEach(task => { %>
+          <div class="task-card on-hold">
+            <div class="task-card-header">
+              <h3 class="task-card-title"><%= task.title %></h3>
+              <span class="priority-badge priority-<%= task.priority.toLowerCase() %>">
+                <%= task.priority %>
+              </span>
+            </div>
+            <div class="task-card-project">
+              <a href="/tasks/project/<%= task.project._id %>"><%= task.project.name %></a>
+            </div>
+            <% if (task.description) { %>
+              <div class="task-card-description">
+                <%= task.description.length > 100 ? task.description.substring(0, 100) + '...' : task.description %>
+              </div>
+            <% } %>
+            <div class="task-card-footer">
+              <% if (task.dueDate) { %>
+                <div class="task-card-due-date">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"></path>
+                  </svg>
+                  <%= new Date(task.dueDate).toLocaleDateString() %>
+                </div>
+              <% } %>
+              <div class="task-card-actions">
+                <a href="/tasks/edit/<%= task._id %>" class="btn-icon">
+                  <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="empty-task-list">
+          <p>No tasks on hold</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

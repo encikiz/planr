@@ -1,0 +1,13 @@
+<div class="error-container">
+  <div class="error-content">
+    <h1 class="error-title">Error</h1>
+    <h2 class="error-subtitle">Something went wrong</h2>
+    <p class="error-message"><%= error.message %></p>
+    <% if (process.env.NODE_ENV !== 'production') { %>
+      <div class="error-stack">
+        <pre><%= error.stack %></pre>
+      </div>
+    <% } %>
+    <a href="/" class="btn btn-primary">Go to Dashboard</a>
+  </div>
+</div>
