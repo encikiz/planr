@@ -46,7 +46,7 @@ Planr is a compact project management web application designed to help teams org
    ```
    npm start
    ```
-   
+
    For development with auto-restart:
    ```
    npm run dev
@@ -59,6 +59,14 @@ Planr is a compact project management web application designed to help teams org
 - `npm start`: Start the application
 - `npm run dev`: Start with nodemon for development
 - `npm test`: Run tests (currently not implemented)
+
+## Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Projects Page
+![Projects](screenshots/projects.png)
 
 ## License
 
